@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
+
+  <style>
+    body     {  
+      background: #FFF;
+      display :flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      margin: 0px;
+      padding: 0px;
+    } 
+    #c {
+      border: 1px solid #000;
+    }
+    #Main {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+    }
+    #Menu {
+      width: 15%;
+      padding: 20px;
+    }
+    #Rose {
+      width: 85%;
+      max-height: 100%;
+
+      overflow: scroll;
+      text-align: center;
+    }
+  </style>
+  </head>
+<body>
+
+  <div id="Main">
+    <div id="Menu"> 
+      <br/><br/>
+      ImageSize : <span id='Sv'>400</span>px<br/> 
+      <input type="range" id="S" name="S" min="200" max="2000" value="400" step="100"/><br/>
+
+
+      Line Color : <br/> 
+      <input type="color" id="color" name="color" value="#FF0000"/><br/> 
+      <br/>
+      Line thickness : <span id='Tv'>2</span><br/>
+      <input type="range" id="thickness" name="thickness" min="1" max="10" value="2"/><br/>
+      <br/>
+      <br/>
+      Form Parameter : <a target="_blank" href="https://upload.wikimedia.org/wikipedia/commons/b/b4/Rose-rhodonea-curve-7x9-chart-improved.svg">???</a> <br/>
+      <br/>
+      N : <span id='Nv'>4</span><br/>
+      <input type="range" id="N" name="N" min="1" max="7" value="4"/><br/>
+      D : <span id='Dv'>2</span><br/>
+      <input type="range" id="D" name="D" min="1" max="9" value="2"/><br/>
+      <br/>
+      <br/>
+      <br/>
+      <input type="button" id="G" value="Generate"/><br/>
+
+    </div>
+    <dir id=Rose>
+        <canvas id="c"></canvas>
+    </dir>
+  </div>
+
+
+
+</body>
+
+    <script>
+
+        d3.select('#S').on("change", _ => d3.select('#Sv').text(d3.select('#S').property("value")));
+        d3.select('#thickness').on("change", _ => d3.select('#Tv').text(d3.select('#thickness').property("value")));
+        d3.select('#N').on("change", _ => d3.select('#Nv').text(d3.select('#N').property("value")));
+        d3.select('#D').on("change", _ => d3.select('#Dv').text(d3.select('#D').property("value")));
+
+        d3.select('#G').on("click", setup);
+        // What is k, n, d variable?
+        // you can understand to see follow svg image.
+        // https://en.wikipedia.org/wiki/Rose_(mathematics)#/media/File:Rose-rhodonea-curve-7x9-chart-improved.svg
+        function rose(theta, n, d, amplitude) {
+          var k = n / d;
+          var x = amplitude * Math.cos(k * theta) * Math.cos(theta);
+          var y = amplitude * Math.cos(k * theta) * Math.sin(theta);  
+          return {"x":x, "y": y};
+        }
+
+        function point(x, y, context) {
+        }
+
+        var canvas, context, width, height, nodes;
+        var t = 0;
+
+        function setup() {
+
+          console.log("BONJOUR")
+          const size = d3.select('#S').property("value");
+          // initialize canvas.
+          canvas = document.getElementById('c');
+          context = canvas.getContext('2d');
+          canvas.width = size;
+          canvas.height = size;
+
+          context.clearRect(0,0,size,size);
+          
+          
+          // point style
+          context.strokeStyle = d3.select('#color').property("value");
+          context.fillStyle = d3.select('#color').property("value");
+
+          context.translate(size/2, size/2); // (0, 0) set to screen center position.
+          for(i=0; i< 10000; i++) {
+              var n = d3.select('#N').property("value");
+              var d = d3.select('#D').property("value");
+              var p = rose(i/100, n, d, size / 2 - 20);
+              context.beginPath();
+              context.arc(p.x, p.y, d3.select('#thickness').property("value"), 0, 2 * Math.PI, true);
+              context.fill();
+              context.stroke();
+          }
+        }
+        setup();
+    </script>
+
+</html>
